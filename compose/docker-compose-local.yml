@@ -1,0 +1,41 @@
+version: '3'
+name: request-logger
+
+services:
+    web:
+        image: nginx
+        container_name: nginx
+        volumes:
+            - ../src/nginx.conf:/etc/nginx/nginx.conf:ro
+        command: [nginx-debug, '-g', 'daemon off;']
+        ports:
+            - "8080:80"
+        environment:
+            - NGINX_HOST=foobar.com
+            - NGINX_PORT=80
+        networks:
+            - nginx.docker
+    
+    requestlogger:
+        container_name: request-logger
+        build:
+            context: ../src
+            dockerfile: RequestLogger\Dockerfile
+        networks:
+            - nginx.docker
+            
+    mockserver:
+      image: mockserver/mockserver:latest
+      container_name: mock-server
+      environment:
+        MOCKSERVER_WATCH_INITIALIZATION_JSON: "true"
+        MOCKSERVER_PROPERTY_FILE: /config/mockserver.properties
+        MOCKSERVER_INITIALIZATION_JSON_PATH: /config/initializerJson.json
+      volumes:
+        - ../src/MockServerConfig/initializerJson.json:/config/initializerJson.json:ro
+      networks:
+        - nginx.docker
+
+networks:
+  nginx.docker:
+    name: nginx.docker
