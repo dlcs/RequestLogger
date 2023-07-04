@@ -25,17 +25,35 @@ services:
             - nginx.docker
             
     mockserver:
-      image: mockserver/mockserver:latest
-      container_name: mock-server
-      environment:
-        MOCKSERVER_WATCH_INITIALIZATION_JSON: "true"
-        MOCKSERVER_PROPERTY_FILE: /config/mockserver.properties
-        MOCKSERVER_INITIALIZATION_JSON_PATH: /config/initializerJson.json
-      volumes:
-        - ../src/MockServerConfig/initializerJson.json:/config/initializerJson.json:ro
-      networks:
-        - nginx.docker
+        image: mockserver/mockserver:latest
+        container_name: mock-server
+        environment:
+            MOCKSERVER_WATCH_INITIALIZATION_JSON: "true"
+            MOCKSERVER_PROPERTY_FILE: /config/mockserver.properties
+            MOCKSERVER_INITIALIZATION_JSON_PATH: /config/initializerJson.json
+        volumes:
+            - ../src/MockServerConfig/initializerJson.json:/config/initializerJson.json:ro
+        networks:
+            - nginx.docker
+        
+    postgres:
+        image: postgres:12.15
+        container_name: postgres
+        hostname: postgres
+        ports:
+          - "5452:5432"
+        volumes:
+          - rl_postgres_data:/var/lib/postgresql/data
+          - rl_postgres_data_backups:/backups
+        env_file:
+          - .env
+        networks:
+            - nginx.docker
 
 networks:
   nginx.docker:
     name: nginx.docker
+
+volumes:
+    rl_postgres_data: {}
+    rl_postgres_data_backups: {}
