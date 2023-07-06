@@ -7,17 +7,28 @@ namespace RequestLogger.Services;
 
 public class RequestLoggerService : IRequestLoggerService
 {
-    private RequestLoggerContext _context;
-    public RequestLoggerService(RequestLoggerContext context)
+    private readonly RequestLoggerContext _context;
+    private readonly IBlacklistService _blacklistService;
+    public RequestLoggerService(RequestLoggerContext context, IBlacklistService blacklistService)
     {
         _context = context;
+        _blacklistService = blacklistService;
     }
     
-    public async Task WriteLogMessage(Request request)
+    public async Task<Request?> WriteLogMessage(Request request)
     {
-        var httpRequest = RequestConverter.ConvertRequest(request);
-        await _context.Requests.AddAsync(httpRequest);
+        var (doNotStore, requestAfterBlacklist) = _blacklistService.CheckBlacklist(request);
+
+        if (doNotStore) return requestAfterBlacklist;
+
+        if (requestAfterBlacklist != null)
+        {
+            var httpRequest = RequestConverter.ConvertRequest(requestAfterBlacklist);
+            await _context.Requests.AddAsync(httpRequest);
+        }
 
         await _context.SaveChangesAsync();
+
+        return requestAfterBlacklist;
     }
 }

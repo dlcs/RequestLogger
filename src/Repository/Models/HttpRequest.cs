@@ -1,14 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace Repository.Models;
+﻿namespace Repository.Models;
 
 public class HttpRequest
 {
     /// <summary>
     /// Unique identifier for a request
     /// </summary>
-    [Key]
     public int Id { get; set; }
 
     /// <summary>
@@ -49,6 +45,5 @@ public class HttpRequest
     /// <summary>
     /// The time the request was made
     /// </summary>
-    [Column(TypeName = "timestamp")]
     public DateTime RequestTime { get; set; }
 }

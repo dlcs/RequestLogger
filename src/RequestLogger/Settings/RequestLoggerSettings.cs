@@ -2,5 +2,5 @@
 
 public class RequestLoggerSettings
 {
-    
+    public BlacklistSettings BlacklistSettings { get; set; } = new();
 }

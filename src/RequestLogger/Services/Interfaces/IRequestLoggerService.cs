@@ -4,5 +4,5 @@ namespace RequestLogger.Services.Interfaces;
 
 public interface IRequestLoggerService
 {
-    Task WriteLogMessage(Request request);
+    Task<Request?> WriteLogMessage(Request request);
 }

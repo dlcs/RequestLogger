@@ -10,6 +10,11 @@
     <ItemGroup>
         <PackageReference Include="MappingGenerator" Version="2023.3.56" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.19" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.19">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="6.0.19" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.19" />
         <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
         <PackageReference Include="Serilog" Version="3.0.1" />
@@ -17,6 +22,7 @@
         <PackageReference Include="Serilog.Sinks.Console" Version="4.1.1-dev-00910" />
         <PackageReference Include="Serilog.Sinks.File" Version="5.0.1-dev-00947" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+        <PackageReference Include="System.Configuration.ConfigurationManager" Version="6.0.1" />
     </ItemGroup>
 
     <ItemGroup>

@@ -403,3 +403,4 @@ FodyWeavers.xsd
 
 # Project specific
 */appsettings.Development.json
+*/appsettings.Docker.json

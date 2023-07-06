@@ -1,4 +1,5 @@
-﻿using HttpRequest = Repository.Models.HttpRequest;
+﻿using System.Text.Json;
+using HttpRequest = Repository.Models.HttpRequest;
 
 namespace RequestLogger.Dto.Converters;
 
@@ -12,9 +13,9 @@ public static class RequestConverter
             Service = request.Service,
             Customer = request.Customer,
             Path = request.Path,
-            QueryParams = request.QueryParams,
+            QueryParams = request.QueryParams != null ? JsonSerializer.Serialize(request.QueryParams) : null,
             Body = request.Body,
-            Headers = request.Headers,
+            Headers = JsonSerializer.Serialize(request.Headers),
             RequestTime = request.RequestTime
         };
     }

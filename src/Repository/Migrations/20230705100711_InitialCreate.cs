@@ -15,15 +15,15 @@ namespace Repository.Migrations
                 columns: table => new
                 {
                     id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.SerialColumn),
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     verb = table.Column<string>(type: "text", nullable: false),
                     service = table.Column<string>(type: "text", nullable: true),
                     customer = table.Column<string>(type: "text", nullable: true),
                     path = table.Column<string>(type: "text", nullable: false),
                     query_params = table.Column<string>(type: "text", nullable: true),
-                    body = table.Column<string>(type: "text", nullable: true),
-                    headers = table.Column<string>(type: "text", nullable: true),
-                    request_time = table.Column<DateTime>(type: "timestamp", nullable: false)
+                    body = table.Column<string>(type: "jsonb", nullable: true),
+                    headers = table.Column<string>(type: "jsonb", nullable: true),
+                    request_time = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {

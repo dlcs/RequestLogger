@@ -23,6 +23,8 @@ services:
             dockerfile: RequestLogger\Dockerfile
         networks:
             - nginx.docker
+        env_file:
+            - .env
             
     mockserver:
         image: mockserver/mockserver:latest
@@ -41,12 +43,12 @@ services:
         container_name: postgres
         hostname: postgres
         ports:
-          - "5452:5432"
+            - "5452:5432"
         volumes:
-          - rl_postgres_data:/var/lib/postgresql/data
-          - rl_postgres_data_backups:/backups
+            - rl_postgres_data:/var/lib/postgresql/data
+            - rl_postgres_data_backups:/backups
         env_file:
-          - .env
+            - .env
         networks:
             - nginx.docker
 

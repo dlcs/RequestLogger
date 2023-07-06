@@ -25,14 +25,18 @@ This will run 4 containers.  These are as follows:
 - A built version of the Request Logger application
     - This is built from the Dockerfile found in RequestLogger
 
+#### RequestLogger Settings
+
+by default, the application is set to use settings from the `appsettings.Docker.json` app settings file.  If changes are made to this file after the containers are built, the command `docker-compose -f docker-compose-local.yml build` will need to be run from the `compose` folder.
+
 #### Entity Framework
 
-Once the docker containers are built, the database can be constructed by running the following command from the `src` directory
+Once the docker containers are built, the database can be constructed by setting the `RunMigrations` value to `true` in the `appsettings` and the migrations will be run on startup.
 
-**Note:** you will need to replace the `User Id` and `Password` values with your own
+##### Adding migrations
+
+Migrations can be added with the following commaand being run from the `src` directory
 
 ```powershell
-dotnet ef database update --project .\Repository\ --connection "Server=127.0.0.1;Port=5452;Database=postgres;User Id=<username>;Password=<password>;"
+dotnet ef migrations add <migration name> -p .\Repository\ -s .\RequestLogger\
 ```
-
-Alternatively, the `RunMigrations` value can be set to `true` in the `appsettings` and the migrations will be run when the code is run from the project.

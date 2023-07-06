@@ -4,6 +4,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestLogger", "RequestLog
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Repository", "Repository\Repository.csproj", "{760E0EFC-C21E-46BA-9A39-C6E1D72D012E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{39AFEA94-0387-4293-9046-6192B90B0D57}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RequestLogger.Tests", "RequestLogger.Tests\RequestLogger.Tests.csproj", "{18D1EA7C-7927-4449-B88D-A192326F11B2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +22,12 @@ Global
 		{760E0EFC-C21E-46BA-9A39-C6E1D72D012E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{760E0EFC-C21E-46BA-9A39-C6E1D72D012E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{760E0EFC-C21E-46BA-9A39-C6E1D72D012E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18D1EA7C-7927-4449-B88D-A192326F11B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18D1EA7C-7927-4449-B88D-A192326F11B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18D1EA7C-7927-4449-B88D-A192326F11B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18D1EA7C-7927-4449-B88D-A192326F11B2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{18D1EA7C-7927-4449-B88D-A192326F11B2} = {39AFEA94-0387-4293-9046-6192B90B0D57}
 	EndGlobalSection
 EndGlobal

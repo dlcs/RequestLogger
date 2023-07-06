@@ -19,7 +19,9 @@ public static class RequestLoggerContextConfiguration
             .AddDbContext<RequestLoggerContext>(options => SetupOptions(configuration, options));
     private static void SetupOptions(IConfiguration configuration,
         DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseNpgsql(configuration.GetConnectionString(ConnectionStringKey) ?? string.Empty);
+        => optionsBuilder
+            .UseNpgsql(configuration.GetConnectionString(ConnectionStringKey) ?? string.Empty)
+            .UseSnakeCaseNamingConvention();
     
     /// <summary>
     /// Run EF migrations if "RunMigrations" = true
@@ -29,7 +31,6 @@ public static class RequestLoggerContextConfiguration
         if (configuration.GetValue(RunMigrationsKey, false))
         {
             using var context = new RequestLoggerContext(GetOptionsBuilder(configuration).Options);
-            
             var pendingMigrations = context.Database.GetPendingMigrations().ToList();
             if (pendingMigrations.Count == 0)
             {

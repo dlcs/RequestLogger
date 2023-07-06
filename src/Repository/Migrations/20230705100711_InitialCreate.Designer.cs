@@ -12,7 +12,7 @@ using Repository;
 namespace Repository.Migrations
 {
     [DbContext(typeof(RequestLoggerContext))]
-    [Migration("20230704163029_InitialCreate")]
+    [Migration("20230705100711_InitialCreate")]
     partial class InitialCreate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -22,7 +22,7 @@ namespace Repository.Migrations
                 .HasAnnotation("ProductVersion", "6.0.19")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            NpgsqlModelBuilderExtensions.UseSerialColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Repository.Models.HttpRequest", b =>
                 {
@@ -31,10 +31,10 @@ namespace Repository.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("id");
 
-                    NpgsqlPropertyBuilderExtensions.UseSerialColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Body")
-                        .HasColumnType("text")
+                        .HasColumnType("jsonb")
                         .HasColumnName("body");
 
                     b.Property<string>("Customer")
@@ -42,7 +42,7 @@ namespace Repository.Migrations
                         .HasColumnName("customer");
 
                     b.Property<string>("Headers")
-                        .HasColumnType("text")
+                        .HasColumnType("jsonb")
                         .HasColumnName("headers");
 
                     b.Property<string>("Path")
@@ -55,7 +55,7 @@ namespace Repository.Migrations
                         .HasColumnName("query_params");
 
                     b.Property<DateTime>("RequestTime")
-                        .HasColumnType("timestamp")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("request_time");
 
                     b.Property<string>("Service")
@@ -71,6 +71,8 @@ namespace Repository.Migrations
                         .HasName("pk_requests");
 
                     b.ToTable("requests", (string)null);
+
+                    b.HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
                 });
 #pragma warning restore 612, 618
         }
