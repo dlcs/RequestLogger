@@ -31,8 +31,6 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ghcr.io/dlcs/request-logger
-          context: ./src
-          dockerfile: src/RequestLogger/Dockerfile
           tags: |
             type=ref,event=branch
             type=ref,event=pr
@@ -59,7 +57,8 @@ jobs:
       - id: docker_build
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ./src
+          file: src/RequestLogger/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           tags: ${{ steps.docker-meta.outputs.tags }}
           labels: ${{ steps.docker-meta.outputs.labels }}
