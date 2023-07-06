@@ -32,7 +32,7 @@ jobs:
         with:
           images: ghcr.io/dlcs/request-logger
           context: ./src
-          dockerfile: RequestLogger/Dockerfile
+          dockerfile: src/RequestLogger/Dockerfile
           tags: |
             type=ref,event=branch
             type=ref,event=pr
