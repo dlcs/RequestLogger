@@ -31,8 +31,8 @@ jobs:
         uses: docker/metadata-action@v4
         with:
           images: ghcr.io/dlcs/request-logger
-          context: ./src/RequestLogger
-          dockerfile: "Dockerfile"
+          context: ./src
+          dockerfile: RequestLogger/Dockerfile
           tags: |
             type=ref,event=branch
             type=ref,event=pr
