@@ -10,6 +10,7 @@ using AutoFixture;
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using RequestLogger.Tests.Helpers;
 
 #pragma warning disable CS8620
 
@@ -24,7 +25,7 @@ public class ProgramTests
     {
         var root = new InMemoryDatabaseRoot();
         
-        _sut = new WebApplicationFactory<Program>()
+        _sut = new RequestLoggerAppBuilderFactory<Program>()
             .WithWebHostBuilder(builder => builder.ConfigureServices(services =>
             {
                 var descriptor = services.SingleOrDefault(

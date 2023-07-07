@@ -43,26 +43,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-Log.Information("Blacklist settings: {@Settings}", app.Configuration.GetSection("RequestLoggerSettings").Get<RequestLoggerSettings>());
+Log.Information("Request logger settings: {@Settings}", app.Configuration.GetSection("RequestLoggerSettings").Get<RequestLoggerSettings>());
 
-using (var scope = app.Services.CreateScope()) {
-   
-    var context = scope.ServiceProvider.GetRequiredService<RequestLoggerContext>();
-    if (!context.Database.IsInMemory())
-    {
-        RequestLoggerContextConfiguration.TryRunMigrations(builder.Configuration);
-    }
-}
-
+RequestLoggerContextConfiguration.TryRunMigrations(builder.Configuration);
 
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.Use(async (context, next) =>
+app.Run(async (context) =>
 {
-    var testTwo = app.Configuration.Get<BlacklistSettings>();
-    
     context.Request.EnableBuffering();
     context.Request.Body.Position = 0;
 
@@ -107,10 +97,6 @@ app.Use(async (context, next) =>
     var requestCompleted = await loggerService.WriteLogMessage(request);
     
     await context.Response.WriteAsync(JsonSerializer.Serialize(requestCompleted));
-    return;
-
-    // This is never hit, but the code complains if it's not there
-    await next(context);
 });
 
 bool IsJsonValid(string json)
