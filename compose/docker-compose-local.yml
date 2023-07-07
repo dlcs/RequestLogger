@@ -16,6 +16,7 @@ services:
             - EXTERNAL_PORT=80
             - NGINX_PROXY_PASS_MIRROR_LOCATION=http://requestlogger
             - NGINX_PROXY_PASS_LOCATION=http://mockserver:1080
+            - SERVICE=DLCS-local
         networks:
             - nginx.docker
     

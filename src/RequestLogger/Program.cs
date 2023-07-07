@@ -82,10 +82,12 @@ app.Run(async (context) =>
     var parsedQueryString = HttpUtility.ParseQueryString(context.Request.QueryString.ToString());
     var queryStringDictionary = parsedQueryString.HasKeys() ? parsedQueryString.AllKeys.ToDictionary(k => k!, k => parsedQueryString[k]!) : null;
 
+    var service = context.Request.Headers.TryGetValue("X-Service", out var header) ? header.ToString() : context.Request.Host.Value;
+    
     var request = new Request()
     {
         Verb = context.Request.Method,
-        Service = context.Request.Host.Value,
+        Service = service,
         Customer = customerId,
         Path = context.Request.Path,
         QueryParams = queryStringDictionary,
