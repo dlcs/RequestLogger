@@ -17,6 +17,8 @@ var logger = new LoggerConfiguration()
     .WriteTo.Console()
     .CreateLogger();
 
+Log.Logger = logger;
+
 // Register Serilog
 builder.Logging.AddSerilog(logger);
 
@@ -41,6 +43,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+Log.Information("Blacklist settings: {@Settings}", app.Configuration.GetSection("RequestLoggerSettings").Get<RequestLoggerSettings>());
+
 using (var scope = app.Services.CreateScope()) {
    
     var context = scope.ServiceProvider.GetRequiredService<RequestLoggerContext>();
@@ -57,6 +61,8 @@ app.UseAuthorization();
 
 app.Use(async (context, next) =>
 {
+    var testTwo = app.Configuration.Get<BlacklistSettings>();
+    
     context.Request.EnableBuffering();
     context.Request.Body.Position = 0;
 
