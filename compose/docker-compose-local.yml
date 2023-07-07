@@ -3,10 +3,14 @@ name: request-logger
 
 services:
     web:
-        image: nginx
         container_name: nginx
-        volumes:
-            - ../src/nginx.conf:/etc/nginx/nginx.conf:ro
+        build:
+            context: ../nginx
+            dockerfile: nginx.local.Dockerfile
+        # image: nginx
+        # container_name: nginx
+        # volumes:
+            # - ../src/nginx.conf:/etc/nginx/nginx.conf:ro
         command: [nginx-debug, '-g', 'daemon off;']
         ports:
             - "8080:80"
