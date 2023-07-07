@@ -402,5 +402,5 @@ FodyWeavers.xsd
 *.env
 
 # Project specific
-*/appsettings.Development.json
-*/appsettings.Docker.json
+*appsettings.Development.json
+*appsettings.Docker.json
