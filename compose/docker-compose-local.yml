@@ -6,17 +6,16 @@ services:
         container_name: nginx
         build:
             context: ../nginx
-            dockerfile: nginx.local.Dockerfile
-        # image: nginx
-        # container_name: nginx
-        # volumes:
-            # - ../src/nginx.conf:/etc/nginx/nginx.conf:ro
+            dockerfile: nginx.Dockerfile
         command: [nginx-debug, '-g', 'daemon off;']
         ports:
             - "8080:80"
         environment:
             - NGINX_HOST=foobar.com
             - NGINX_PORT=80
+            - EXTERNAL_PORT=80
+            - NGINX_PROXY_PASS_MIRROR_LOCATION=http://requestlogger
+            - NGINX_PROXY_PASS_LOCATION=http://mockserver:1080
         networks:
             - nginx.docker
     
