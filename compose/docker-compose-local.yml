@@ -17,6 +17,7 @@ services:
             - NGINX_PROXY_PASS_MIRROR_LOCATION=http://requestlogger
             - NGINX_PROXY_PASS_LOCATION=http://mockserver:1080
             - SERVICE=DLCS-local
+            - NGINX_RESOLVER=127.0.0.11
         networks:
             - nginx.docker
     
