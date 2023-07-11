@@ -18,16 +18,14 @@ services:
             - NGINX_PROXY_PASS_LOCATION=http://mockserver:1080
             - SERVICE=DLCS-local
             - NGINX_RESOLVER=127.0.0.11
-        networks:
-            - nginx.docker
     
     requestlogger:
         container_name: request-logger
         build:
             context: ../src
             dockerfile: RequestLogger\Dockerfile
-        networks:
-            - nginx.docker
+        environment:
+            - ConnectionStrings__PostgreSQLConnection=Server=postgres;Port=5432;Database=${POSTGRES_DB};User Id=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
         env_file:
             - .env
             
@@ -40,8 +38,6 @@ services:
             MOCKSERVER_INITIALIZATION_JSON_PATH: /config/initializerJson.json
         volumes:
             - ../src/MockServerConfig/initializerJson.json:/config/initializerJson.json:ro
-        networks:
-            - nginx.docker
         
     postgres:
         image: postgres:12.15
@@ -54,12 +50,6 @@ services:
             - rl_postgres_data_backups:/backups
         env_file:
             - .env
-        networks:
-            - nginx.docker
-
-networks:
-  nginx.docker:
-    name: nginx.docker
 
 volumes:
     rl_postgres_data: {}

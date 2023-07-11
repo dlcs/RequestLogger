@@ -31,13 +31,13 @@ public class RequestLoggerServiceTests
     }
     
     [Fact]
-    public void WriteLogMessage_ReturnsLogMessage_WhenCalledCorrectly()
+    public async Task WriteLogMessage_ReturnsLogMessage_WhenCalledCorrectly()
     {
         // Arrange
         var request = _fixture.Create<Request>();
 
         // Act
-        var response = _requestLoggerService.WriteLogMessage(request).Result;
+        var response = await _requestLoggerService.WriteLogMessage(request);
 
         //Assert
         response?.Body.Should().Be(request.Body);
@@ -46,13 +46,13 @@ public class RequestLoggerServiceTests
     }
     
     [Fact]
-    public void WriteLogMessage_ActuallyWritesToDatabase_WhenCalledCorrectly()
+    public async Task WriteLogMessage_ActuallyWritesToDatabase_WhenCalledCorrectly()
     {
         // Arrange
         var request = _fixture.Create<Request>();
 
         // Act
-         _ = _requestLoggerService.WriteLogMessage(request).Result;
+         _ = await _requestLoggerService.WriteLogMessage(request);
 
         //Assert
         var databaseItem = _requestLoggerContext.Requests.FirstOrDefault(r => r.Id == 1);

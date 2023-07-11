@@ -42,7 +42,7 @@ public class ProgramTests
     }
     
     [Fact]
-    public void Program_CallingGet_ReturnsResponse()
+    public async Task Program_CallingGet_ReturnsResponse()
     {
         // Arrange
         var request = _fixture.Create<Request>();
@@ -59,7 +59,7 @@ public class ProgramTests
         var client = app.CreateClient();
 
         // Act
-        var response = client.GetAsync("/stuff/").Result;
+        var response = await client.GetAsync("/stuff/");
         
         //Assert
         response.Should().NotBeNull();
@@ -68,7 +68,7 @@ public class ProgramTests
     }
     
     [Fact]
-    public void Program_MakingCall_ReturnsResponseFromDatabase()
+    public async Task Program_MakingCall_ReturnsResponseFromDatabase()
     {
         // Arrange
         var client = _sut.CreateClient();
@@ -76,107 +76,107 @@ public class ProgramTests
         
         
         // Act
-        var response = client.GetAsync("/stuff/").Result;
+        var response = await client.GetAsync("/stuff/");
         
-        var responseContent = response.Content.ReadAsStringAsync().Result;
-        var request = JsonSerializer.Deserialize<Request>(responseContent);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var parsedContent = JsonSerializer.Deserialize<Request>(responseContent);
         
         //Assert
         response.Should().NotBeNull();
         response.IsSuccessStatusCode.Should().BeTrue();
-        request?.Customer.Should().BeNull();
-        request?.Body.Should().BeNull();
-        request?.Verb.Should().Be("GET");
-        request?.QueryParams.Should().BeNull();
+        parsedContent?.Customer.Should().BeNull();
+        parsedContent?.Body.Should().BeNull();
+        parsedContent?.Verb.Should().Be("GET");
+        parsedContent?.QueryParams.Should().BeNull();
     }
     
     [Fact]
-    public void Program_MakingCall_ReturnsCustomerSuccessfully()
+    public async Task Program_MakingCall_ReturnsCustomerSuccessfully()
     {
         // Arrange
         var client = _sut.CreateClient();
 
         // Act
-        var response = client.GetAsync("/stuff/customer/3425234").Result;
+        var response = await client.GetAsync("/stuff/customer/3425234");
         
-        var responseContent = response.Content.ReadAsStringAsync().Result;
-        var request = JsonSerializer.Deserialize<Request>(responseContent);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var parsedContent = JsonSerializer.Deserialize<Request>(responseContent);
         
         //Assert
         response.Should().NotBeNull();
         response.IsSuccessStatusCode.Should().BeTrue();
-        request?.Customer.Should().Be("3425234");
-        request?.Body.Should().BeNull();
-        request?.Verb.Should().Be("GET");
-        request?.QueryParams.Should().BeNull();
+        parsedContent?.Customer.Should().Be("3425234");
+        parsedContent?.Body.Should().BeNull();
+        parsedContent?.Verb.Should().Be("GET");
+        parsedContent?.QueryParams.Should().BeNull();
     }
 
     [Fact] 
-    public void Program_MakingCall_ReturnsQueryParamsSuccessfully()
+    public async Task Program_MakingCall_ReturnsQueryParamsSuccessfully()
     {
         // Arrange
         var client = _sut.CreateClient();
 
         // Act
-        var response = client.GetAsync("/some/url/3425234?query=something").Result;
+        var response = await client.GetAsync("/some/url/3425234?query=something");
         
-        var responseContent = response.Content.ReadAsStringAsync().Result;
-        var request = JsonSerializer.Deserialize<Request>(responseContent);
-        
-        //Assert
-        response.Should().NotBeNull();
-        response.IsSuccessStatusCode.Should().BeTrue();
-        request?.Customer.Should().BeNull();
-        request?.Body.Should().BeNull();
-        request?.Verb.Should().Be("GET");
-        request?.QueryParams.Should().ContainKey("query");
-    }
-    
-    [Fact] 
-    public void Program_MakingPostCall_ReturnsCorrectVerb()
-    {
-        // Arrange
-        var client = _sut.CreateClient();
-
-        // Act
-        var response = client.PostAsync("/some/uri", new StringContent("")).Result;
-        
-        var responseContent = response.Content.ReadAsStringAsync().Result;
-        var request = JsonSerializer.Deserialize<Request>(responseContent);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var parsedContent = JsonSerializer.Deserialize<Request>(responseContent);
         
         //Assert
         response.Should().NotBeNull();
         response.IsSuccessStatusCode.Should().BeTrue();
-        request?.Customer.Should().BeNull();
-        request?.Body.Should().BeNull();
-        request?.Verb.Should().Be("POST");
-        request?.QueryParams.Should().BeNull();
+        parsedContent?.Customer.Should().BeNull();
+        parsedContent?.Body.Should().BeNull();
+        parsedContent?.Verb.Should().Be("GET");
+        parsedContent?.QueryParams.Should().ContainKey("query");
     }
     
     [Fact] 
-    public void Program_MakingPostCallWithJsonBody_ReturnsCorrectBody()
+    public async Task Program_MakingPostCall_ReturnsCorrectVerb()
+    {
+        // Arrange
+        var client = _sut.CreateClient();
+
+        // Act
+        var response = await client.PostAsync("/some/uri", new StringContent(""));
+        
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var parsedContent = JsonSerializer.Deserialize<Request>(responseContent);
+        
+        //Assert
+        response.Should().NotBeNull();
+        response.IsSuccessStatusCode.Should().BeTrue();
+        parsedContent?.Customer.Should().BeNull();
+        parsedContent?.Body.Should().BeNull();
+        parsedContent?.Verb.Should().Be("POST");
+        parsedContent?.QueryParams.Should().BeNull();
+    }
+    
+    [Fact] 
+    public async Task Program_MakingPostCallWithJsonBody_ReturnsCorrectBody()
     {
         // Arrange
         var client = _sut.CreateClient();
         var jsonBody = "{\"test\": \"test\"}";
 
         // Act
-        var response = client.PostAsync("/some/uri", new StringContent(jsonBody)).Result;
+        var response = await client.PostAsync("/some/uri", new StringContent(jsonBody));
         
-        var responseContent = response.Content.ReadAsStringAsync().Result;
-        var request = JsonSerializer.Deserialize<Request>(responseContent);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var parsedContent = JsonSerializer.Deserialize<Request>(responseContent);
         
         //Assert
         response.Should().NotBeNull();
         response.IsSuccessStatusCode.Should().BeTrue();
-        request?.Customer.Should().BeNull();
-        request?.Body.Should().Be(jsonBody);
-        request?.Verb.Should().Be("POST");
-        request?.QueryParams.Should().BeNull();
+        parsedContent?.Customer.Should().BeNull();
+        parsedContent?.Body.Should().Be(jsonBody);
+        parsedContent?.Verb.Should().Be("POST");
+        parsedContent?.QueryParams.Should().BeNull();
     }
     
     [Fact] 
-    public void Program_MakingPostCallWithInvalidJsonBody_ReturnsCorrectBody()
+    public async Task Program_MakingPostCallWithInvalidJsonBody_ReturnsCorrectBody()
     {
         // Arrange
         var client = _sut.CreateClient();
@@ -184,17 +184,17 @@ public class ProgramTests
         var jsonBody = "{ \"invalidJson\": \"test\" }";
         
         // Act
-        var response = client.PostAsync("/some/uri", new StringContent(requestBody)).Result;
+        var response = await client.PostAsync("/some/uri", new StringContent(requestBody));
         
-        var responseContent = response.Content.ReadAsStringAsync().Result;
-        var request = JsonSerializer.Deserialize<Request>(responseContent);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        var parsedContent = JsonSerializer.Deserialize<Request>(responseContent);
         
         //Assert
         response.Should().NotBeNull();
         response.IsSuccessStatusCode.Should().BeTrue();
-        request?.Customer.Should().BeNull();
-        request?.Body.Should().Be(jsonBody);
-        request?.Verb.Should().Be("POST");
-        request?.QueryParams.Should().BeNull();
+        parsedContent?.Customer.Should().BeNull();
+        parsedContent?.Body.Should().Be(jsonBody);
+        parsedContent?.Verb.Should().Be("POST");
+        parsedContent?.QueryParams.Should().BeNull();
     }
 }

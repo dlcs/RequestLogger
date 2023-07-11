@@ -1,5 +1,7 @@
 using System.Text.Json;
 using System.Web;
+using HealthChecks.UI.Client;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Repository;
 using RequestLogger.Dto;
@@ -19,19 +21,21 @@ var logger = new LoggerConfiguration()
 
 Log.Logger = logger;
 
-// Register Serilog
 builder.Logging.AddSerilog(logger);
-
-builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>(); 
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.Configure<RequestLoggerSettings>(builder.Configuration.GetSection("RequestLoggerSettings"));
 
 builder.Services.AddRequestLoggerContext(builder.Configuration);
+
+builder.Services.AddHealthChecks().AddDbContextCheck<RequestLoggerContext>();
+
 builder.Services.AddScoped<IRequestLoggerService, RequestLoggerService>();
+
 builder.Services.AddScoped<IBlacklistService, BlacklistService>();
 
 var app = builder.Build();
@@ -47,15 +51,90 @@ Log.Information("Request logger settings: {@Settings}", app.Configuration.GetSec
 
 RequestLoggerContextConfiguration.TryRunMigrations(builder.Configuration);
 
+app.UseRouting();
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapHealthChecks("/health", new HealthCheckOptions
+    {
+        ResponseWriter = UIResponseWriter.WriteHealthCheckUIResponse
+    });
+});
 
 app.Run(async (context) =>
 {
     context.Request.EnableBuffering();
     context.Request.Body.Position = 0;
 
+    var requestBody = await GetRequestBody(context);
+
+    using var scoped = app.Services.CreateScope();
+
+    // gets the customer id from a path like somePath/customer/<customer id>/somePath
+    var customerId = TryGetCustomerId(context);
+
+    // converts query string into a dictionary (if it has values)
+    var queryStringDictionary = BuildQueryStringDictionary(context);
+
+    var service = TryGetServiceName(context);
+    
+    var request = new Request()
+    {
+        Verb = context.Request.Method,
+        Service = service,
+        Customer = customerId,
+        Path = context.Request.Path,
+        QueryParams = queryStringDictionary,
+        Body = requestBody,
+        Headers = context.Request.Headers.ToDictionary(a => a.Key, a => a.Value.ToString()),
+        RequestTime = DateTime.UtcNow
+    };
+    
+    await SendResponse(request, context);
+});
+
+async Task SendResponse(Request request, HttpContext httpContext)
+{
+    try
+    {
+        await httpContext.Response.WriteAsync(JsonSerializer.Serialize(request));
+    }
+    catch (Exception exception)
+    {
+        Log.Error(exception, "Error writing a response");
+    }
+}
+
+string TryGetServiceName(HttpContext httpContext)
+{
+    var s = httpContext.Request.Headers.TryGetValue("X-Service", out var header)
+        ? header.ToString()
+        : httpContext.Request.Host.Value;
+    return s;
+}
+
+Dictionary<string, string>? BuildQueryStringDictionary(HttpContext httpContext)
+{
+    var parsedQueryString = HttpUtility.ParseQueryString(httpContext.Request.QueryString.ToString());
+    var dictionary = parsedQueryString.HasKeys()
+        ? parsedQueryString.AllKeys.ToDictionary(k => k!, k => parsedQueryString[k]!)
+        : null;
+    return dictionary;
+}
+
+string? TryGetCustomerId(HttpContext httpContext)
+{
+    var s = httpContext.Request.Path.ToString().Split('/')
+        .SkipWhile(p => !p.Equals("customer", StringComparison.OrdinalIgnoreCase)).Skip(1).FirstOrDefault();
+    return s;
+}
+
+async Task<string?> GetRequestBody(HttpContext context)
+{
     var requestBody = await new StreamReader(context.Request.Body).ReadToEndAsync();
 
     if (!requestBody.Equals(string.Empty))
@@ -71,35 +150,8 @@ app.Run(async (context) =>
         requestBody = null;
     }
 
-    using var scoped = app.Services.CreateScope();
-    var loggerService = scoped.ServiceProvider.GetRequiredService<IRequestLoggerService>();
-
-    // gets the customer id from a path like somePath/customer/<customer id>/somePath
-    var customerId = context.Request.Path.ToString().Split('/')
-        .SkipWhile(p => !p.Equals("customer", StringComparison.OrdinalIgnoreCase)).Skip(1).FirstOrDefault();
-
-    // converts query string into a dictionary (if it has values)
-    var parsedQueryString = HttpUtility.ParseQueryString(context.Request.QueryString.ToString());
-    var queryStringDictionary = parsedQueryString.HasKeys() ? parsedQueryString.AllKeys.ToDictionary(k => k!, k => parsedQueryString[k]!) : null;
-
-    var service = context.Request.Headers.TryGetValue("X-Service", out var header) ? header.ToString() : context.Request.Host.Value;
-    
-    var request = new Request()
-    {
-        Verb = context.Request.Method,
-        Service = service,
-        Customer = customerId,
-        Path = context.Request.Path,
-        QueryParams = queryStringDictionary,
-        Body = requestBody,
-        Headers = context.Request.Headers.ToDictionary(a => a.Key, a => a.Value.ToString()),
-        RequestTime = DateTime.UtcNow
-    };
-    
-    var requestCompleted = await loggerService.WriteLogMessage(request);
-    
-    await context.Response.WriteAsync(JsonSerializer.Serialize(requestCompleted));
-});
+    return requestBody;
+}
 
 bool IsJsonValid(string json)
 {

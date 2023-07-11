@@ -10,13 +10,6 @@ public class RequestLoggerContext : DbContext
     /// <summary>
     /// Context class for entity framework
     /// </summary>
-    public RequestLoggerContext()
-    {
-    }
-
-    /// <summary>
-    /// Context class for entity framework
-    /// </summary>
     /// <param name="options">The db context options</param>
     public RequestLoggerContext(DbContextOptions<RequestLoggerContext> options)
         : base(options)
