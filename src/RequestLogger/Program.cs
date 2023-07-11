@@ -129,7 +129,7 @@ Dictionary<string, string>? BuildQueryStringDictionary(HttpContext httpContext)
 string? TryGetCustomerId(HttpContext httpContext)
 {
     var s = httpContext.Request.Path.ToString().Split('/')
-        .SkipWhile(p => !p.Equals("customer", StringComparison.OrdinalIgnoreCase)).Skip(1).FirstOrDefault();
+        .SkipWhile(p => !p.Equals("customers", StringComparison.OrdinalIgnoreCase)).Skip(1).FirstOrDefault();
     return s;
 }
 
