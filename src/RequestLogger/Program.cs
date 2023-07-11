@@ -76,6 +76,8 @@ app.Run(async (context) =>
 
     // gets the customer id from a path like somePath/customer/<customer id>/somePath
     var customerId = TryGetCustomerId(context);
+    
+    var requestLoggerService = scoped.ServiceProvider.GetRequiredService<IRequestLoggerService>();
 
     // converts query string into a dictionary (if it has values)
     var queryStringDictionary = BuildQueryStringDictionary(context);
@@ -94,10 +96,12 @@ app.Run(async (context) =>
         RequestTime = DateTime.UtcNow
     };
     
-    await SendResponse(request, context);
+    var requestCompleted = await requestLoggerService.WriteLogMessage(request);
+    
+    await SendResponse(requestCompleted, context);
 });
 
-async Task SendResponse(Request request, HttpContext httpContext)
+async Task SendResponse(Request? request, HttpContext httpContext)
 {
     try
     {
