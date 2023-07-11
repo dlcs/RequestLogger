@@ -19,7 +19,6 @@ namespace RequestLogger.Tests.Unit;
 public class ProgramTests
 {
     private readonly WebApplicationFactory<Program> _sut;
-    private readonly Fixture _fixture;
 
     public ProgramTests()
     {
@@ -37,34 +36,22 @@ public class ProgramTests
                 services.AddScoped<IBlacklistService, BlacklistService>();
                 services.AddDbContext<RequestLoggerContext>(x => x.UseInMemoryDatabase("Testing", root));
             }));
-        
-        _fixture = new Fixture();
     }
     
     [Fact]
     public async Task Program_CallingGet_ReturnsResponse()
     {
         // Arrange
-        var request = _fixture.Create<Request>();
-        
-        var fakeRequestLoggerService = A.Fake<IRequestLoggerService>();
-        A.CallTo(() => fakeRequestLoggerService.WriteLogMessage(A<Request>.Ignored)).Returns(Task.FromResult(request));
-        
-        var app = new WebApplicationFactory<Program>()
-            .WithWebHostBuilder(builder => builder.ConfigureServices(services =>
-            {
-                services.AddScoped<IRequestLoggerService>(_ => fakeRequestLoggerService);
-            }));
-
-        var client = app.CreateClient();
+        var client = _sut.CreateClient();
 
         // Act
         var response = await client.GetAsync("/stuff/");
+        var responseBody = await response.Content.ReadAsStringAsync(); 
         
         //Assert
         response.Should().NotBeNull();
         response.IsSuccessStatusCode.Should().BeTrue();
-        response.Content.ReadAsStringAsync().Result.Should().Contain(request.Verb);
+        responseBody.Should().Contain("GET");
     }
     
     [Fact]
