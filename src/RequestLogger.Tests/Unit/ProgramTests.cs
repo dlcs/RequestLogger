@@ -84,7 +84,7 @@ public class ProgramTests
         var client = _sut.CreateClient();
 
         // Act
-        var response = await client.GetAsync("/stuff/customer/3425234");
+        var response = await client.GetAsync("/stuff/customers/3425234");
         
         var responseContent = await response.Content.ReadAsStringAsync();
         var parsedContent = JsonSerializer.Deserialize<Request>(responseContent);
