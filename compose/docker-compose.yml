@@ -1,0 +1,56 @@
+version: '3'
+name: request-logger
+
+services:
+    web:
+        container_name: nginx
+        build:
+            context: ../nginx
+            dockerfile: nginx.Dockerfile
+        command: [nginx-debug, '-g', 'daemon off;']
+        ports:
+            - "8080:8080"
+        environment:
+            - NGINX_HOST=foobar.com
+            - NGINX_PORT=80
+            - EXTERNAL_PORT=8080
+            - NGINX_PROXY_PASS_MIRROR_LOCATION=http://requestlogger
+            - NGINX_PROXY_PASS_LOCATION=http://mockserver:1080
+            - SERVICE=DLCS-local
+            - NGINX_RESOLVER=127.0.0.11
+    
+    requestlogger:
+        container_name: request-logger
+        build:
+            context: ../src
+            dockerfile: RequestLogger\Dockerfile
+        environment:
+            - ConnectionStrings__PostgreSQLConnection=Server=postgres;Port=5432;Database=${POSTGRES_DB};User Id=${POSTGRES_USER};Password=${POSTGRES_PASSWORD};
+        env_file:
+            - .env
+            
+    mockserver:
+        image: mockserver/mockserver:latest
+        container_name: mock-server
+        environment:
+            MOCKSERVER_WATCH_INITIALIZATION_JSON: "true"
+            MOCKSERVER_PROPERTY_FILE: /config/mockserver.properties
+            MOCKSERVER_INITIALIZATION_JSON_PATH: /config/initializerJson.json
+        volumes:
+            - ../src/MockServerConfig/initializerJson.json:/config/initializerJson.json:ro
+        
+    postgres:
+        image: postgres:12.15
+        container_name: postgres
+        hostname: postgres
+        ports:
+            - "5452:5432"
+        volumes:
+            - rl_postgres_data:/var/lib/postgresql/data
+            - rl_postgres_data_backups:/backups
+        env_file:
+            - .env
+
+volumes:
+    rl_postgres_data: {}
+    rl_postgres_data_backups: {}
