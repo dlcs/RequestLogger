@@ -10,7 +10,7 @@ This project makes use of entity framework code-first and a postgres SQL databas
 first there is a local docker compose file found in the `compose` directory.  This can be run from that directory with the following command:
 
 ```powershell
-docker-compose -f docker-compose-local.yml up
+docker-compose up
 ```
 **Note:** the postgres container needs environment variables in a `.env` file. There's an example in the project under `.env-dist`, but it's reccomended to change the username and password to something more secure.
 
@@ -27,7 +27,7 @@ This will run 4 containers.  These are as follows:
 
 #### RequestLogger Settings
 
-by default, the application is set to use settings from the `appsettings.Docker.json` app settings file.  If changes are made to this file after the containers are built, the command `docker-compose -f docker-compose-local.yml build` will need to be run from the `compose` folder.
+by default, the application is set to use settings from the `appsettings.Docker.json` app settings file.  If changes are made to this file after the containers are built, the command `docker-compose build` will need to be run from the `compose` folder.
 
 #### Entity Framework
 
@@ -39,4 +39,21 @@ Migrations can be added with the following commaand being run from the `src` dir
 
 ```powershell
 dotnet ef migrations add <migration name> -p .\Repository\ -s .\RequestLogger\
+```
+
+### Debugging
+
+There is a `docker-compose.local.yml` that can be used when debugging the RequestLogger app. 
+
+This will start all of the same resources as main `docker-compose.yml` with the following exceptions:
+
+* RequestLogger is _not_ ran
+* Nginx is using host port `:7020` (https port for RequestLogger) as mirror destination
+
+This allows RequestLogger to be run and save to Postgres instance running via compose. Any request to `http://localhost:8080/` will be mirrored to running RequestLogger instance.
+
+This can be ran via:
+
+```bash
+cd compose && docker compose -f docker-compose.local.yml up
 ```
