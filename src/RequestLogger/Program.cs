@@ -21,7 +21,11 @@ var logger = new LoggerConfiguration()
 
 Log.Logger = logger;
 
-builder.Logging.AddSerilog(logger);
+builder.Host.UseSerilog((hostContext, loggerConfiguration)
+    => loggerConfiguration
+        .ReadFrom.Configuration(hostContext.Configuration)
+        .Enrich.FromLogContext());
+
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddControllers();
 
@@ -39,6 +43,7 @@ builder.Services.AddScoped<IRequestLoggerService, RequestLoggerService>();
 builder.Services.AddScoped<IBlacklistService, BlacklistService>();
 
 var app = builder.Build();
+app.UseSerilogRequestLogging();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
